@@ -25,7 +25,7 @@ public class SimpleRouter extends AbstractRouter {
 
     @Override
     public StepState route(Map<String, Object> context, StepState lastStepState) throws Exception {
-        StepState currentStepState ;
+        StepState currentStepState;
         if (Constants._FLOW_CONTINUE_FLAG == lastStepState.getContinueFlag() && nextStepWithRouter != null) {
             IStep step = (IStep) nextStepWithRouter.getFirst();
             if (logger.isDebugEnabled()) {

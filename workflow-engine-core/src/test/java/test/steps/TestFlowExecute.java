@@ -5,8 +5,9 @@ import com.workflow.engine.core.common.FlowBuilder;
 import com.workflow.engine.core.common.StepState;
 import com.workflow.engine.core.common.flow.IStep;
 import com.workflow.engine.core.common.flow.impl.Flow;
-import com.workflow.engine.core.common.flow.impl.SimpleRouter;
 import com.workflow.engine.core.common.utils.FlowBuilderUtil;
+import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,21 +24,35 @@ import static com.workflow.engine.core.common.Constants._STEP_SUCCESS_FLAG;
  * 可以配置子流程,并用子流程拼装成流程链
  * Created by houjinxin on 16/3/9.
  */
-public class Flows {
+public class TestFlowExecute {
 
-    private static Logger logger = LoggerFactory.getLogger(Flows.class);
+    private static Logger logger = LoggerFactory.getLogger(TestFlowExecute.class);
 
-    private static final String _FLOW_FILE_PATH = "/Users/houjinxin/Documents/workflow-engine/workflow-engine-core/src/test/resources/test.flows";
+    private Flow _FLOW;
 
-    public static final Map<String, Class<? extends IStep>> _NAME_STEP_CLAZZ_MAPPINGS = new HashMap<String, Class<? extends IStep>>() {{
-        put("step1", Step1.class);
-        put("step2", Step2.class);
-        put("step3", Step3.class);
-    }};
+    @Before
+    public void setUp(){
+        String flowFilePath = "src/test/resources/test.flows";
+        Map<String, Class<? extends IStep>> nameStepClazzMappings = new HashMap<String, Class<? extends IStep>>() {{
+            put("step1", Step1.class);
+            put("step2", Step2.class);
+            put("step3", Step3.class);
+        }};
+        LinkedList<Object> flowStepOrderConfig = FlowBuilderUtil.extractSteps(flowFilePath);
+        _FLOW = new FlowBuilder(nameStepClazzMappings, flowStepOrderConfig).build();
+    }
 
-    public static final LinkedList<Object> _FLOW_STEP_ORDER_CONFIG = FlowBuilderUtil.extractSteps(_FLOW_FILE_PATH);
-
-    public static final Flow _FLOW = new FlowBuilder(_NAME_STEP_CLAZZ_MAPPINGS, _FLOW_STEP_ORDER_CONFIG).build();
+    @Test
+    public void testFlowExecute() throws Exception {
+        StepState flowState = _FLOW.run(new LinkedHashMap<>());
+        if (flowState.getStatusFlag() == Constants._STEP_SUCCESS_FLAG) {
+            logger.info("流程执行成功");
+        } else if (flowState.getStatusFlag() == Constants._STEP_FAILURE_FLAG) {
+            logger.info("流程执行失败");
+        } else if (flowState.getStatusFlag() == Constants._STEP_SUCCESS_WITH_INFO_FLAG) {
+            logger.info("流程执行成功但需要返回信息");
+        }
+    }
 
     /**
      * Created by houjinxin on 2016/11/8.
@@ -74,15 +89,4 @@ public class Flows {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        Map<String, Object> context = new LinkedHashMap<>();
-        StepState flowState = _FLOW.run(context);
-        if (flowState.getStatusFlag() == Constants._STEP_SUCCESS_FLAG) {
-            logger.info("流程执行成功");
-        } else if (flowState.getStatusFlag() == Constants._STEP_FAILURE_FLAG) {
-            logger.info("流程执行失败");
-        } else if (flowState.getStatusFlag() == Constants._STEP_SUCCESS_WITH_INFO_FLAG) {
-            logger.info("流程执行成功但需要返回信息");
-        }
-    }
 }

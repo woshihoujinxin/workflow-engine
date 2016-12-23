@@ -18,16 +18,18 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * 参数生成策略相关工具类
  * Created by houjinxin on 16/6/3.
  */
 public class ParamsGeneratorStrategyUtil {
 
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(ParamsGeneratorStrategyUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(ParamsGeneratorStrategyUtil.class);
 
     /**
-     * 用于缓存表达式的判定结果,以减少不要的判定
+     * 用于缓存表达式的判定结果,以减少不必要的判定
      */
     private static final Map<String, PreparedExpression> _PREPARED_EXPRESSION_CACHE = new HashMap<>();
 
